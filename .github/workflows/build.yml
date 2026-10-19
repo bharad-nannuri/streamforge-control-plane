@@ -2,8 +2,9 @@ name: build
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "bootstrap/v1-core-runtime"]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   maven:
