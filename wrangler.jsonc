@@ -1,0 +1,39 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "streamforge-labs",
+  "main": "cloudflare/src/index.js",
+  "compatibility_date": "2026-10-19",
+  "upload_source_maps": true,
+  "containers": [
+    {
+      "class_name": "StreamForgeContainer",
+      "image": "./Dockerfile.cloudflare",
+      "image_build_context": ".",
+      "instance_type": "standard-1",
+      "max_instances": 1
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "STREAMFORGE",
+        "class_name": "StreamForgeContainer"
+      }
+    ]
+  },
+  "exports": {
+    "StreamForgeContainer": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    }
+  },
+  "routes": [
+    {
+      "pattern": "labs.bharadnannuri.com",
+      "custom_domain": true
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}
