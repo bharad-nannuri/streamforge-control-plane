@@ -2,7 +2,7 @@ name: build
 
 on:
   push:
-    branches: ["main", "bootstrap/v1-core-runtime"]
+    branches: ["main", "bootstrap/v1-core-runtime", "deploy/cloudflare-labs"]
   pull_request:
   workflow_dispatch:
 
@@ -17,3 +17,10 @@ jobs:
           java-version: "21"
           cache: maven
       - run: mvn -B -ntp verify
+
+  cloudflare-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Cloudflare demo image
+        run: docker build -f Dockerfile.cloudflare -t streamforge-demo:ci .
