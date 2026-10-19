@@ -1,0 +1,36 @@
+# StreamForge public demo runtime.
+# The production/reference architecture remains independently deployable.
+# This image intentionally co-locates Kafka, PostgreSQL and the four Spring
+# services so a portfolio demo can run as one ephemeral Cloudflare Container.
+
+FROM apache/kafka:3.9.1 AS kafka
+
+FROM maven:3.9.9-eclipse-temurin-21 AS build
+WORKDIR /workspace
+COPY pom.xml ./
+COPY services ./services
+RUN mvn -B -ntp package -DskipTests
+
+FROM eclipse-temurin:21-jre-jammy
+USER root
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       bash ca-certificates netcat-openbsd postgresql postgresql-client procps \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=kafka /opt/kafka /opt/kafka
+
+WORKDIR /app
+COPY --from=build /workspace/services/ingestion-service/target/ingestion-service-*.jar /app/ingestion-service.jar
+COPY --from=build /workspace/services/processor-service/target/processor-service-*.jar /app/processor-service.jar
+COPY --from=build /workspace/services/downstream-simulator/target/downstream-simulator-*.jar /app/downstream-simulator.jar
+COPY --from=build /workspace/services/control-plane-service/target/control-plane-service-*.jar /app/control-plane-service.jar
+
+COPY cloudflare/start-demo.sh /app/start-demo.sh
+RUN chmod +x /app/start-demo.sh
+
+EXPOSE 8080
+
+ENTRYPOINT ["/app/start-demo.sh"]
