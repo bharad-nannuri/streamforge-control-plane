@@ -1,62 +1,48 @@
 # StreamForge Control Plane
 
-> A distributed workload orchestration, resilience, and observability platform built to make failure behavior visible.
+**A distributed workload orchestration, resilience, and observability platform built to make production failure behavior visible.**
 
-StreamForge is a portfolio-grade systems project focused on the engineering problems that matter in production: event delivery, backpressure, retries, dead-letter handling, replay, idempotency, service health, SLOs, failure injection, and recovery.
+StreamForge is a hands-on systems project centered on the problems that matter after a service leaves a developer laptop: event delivery, retries, dead-letter handling, replay, idempotency, dependency failures, application-level metrics, and recovery.
 
-## Target architecture
+## What the live demo is designed to show
 
-```text
-                       StreamForge UI
-                             |
-                             v
-                     Control Plane API
-                             |
-          +------------------+------------------+
-          |                  |                  |
-          v                  v                  v
-   Traffic Generator    Failure Controls    Replay Controls
-          |                                     |
-          v                                     |
-      Ingestion API                              |
-          |                                      |
-          v                                      |
-         Kafka  -------------------------------> Retry / DLQ
-          |                                      |
-          v                                      |
-    Processing Worker ----------------------------+
-          |
-          +------------------> PostgreSQL
-          |
-          +------------------> Downstream Simulator
+1. Generate traffic through a Spring Boot ingestion API.
+2. Publish events to Kafka and process them asynchronously.
+3. Persist event state and idempotency keys in PostgreSQL.
+4. Inject downstream latency, HTTP 500s, or unavailability.
+5. Watch retries and DLQ depth grow in the control-plane dashboard.
+6. Restore the dependency and replay failed events.
+7. Verify backlog recovery without duplicate processing.
 
-Observability: Micrometer + Prometheus + OpenTelemetry
-Deployment: Docker Compose first; Kubernetes/Helm next
+## Technology
+
+- Java 21 / Spring Boot 3
+- Apache Kafka
+- PostgreSQL
+- Micrometer / Prometheus
+- Docker / Docker Compose
+- GitHub Actions
+- Self-contained HTML/CSS/JavaScript control-plane UI
+
+## Run locally
+
+```bash
+docker compose up --build
 ```
 
-## v1 scope
+Open http://localhost:8080.
 
-- Java 21 / Spring Boot
-- Kafka-compatible event broker
-- PostgreSQL
-- retries + DLQ + replay
-- idempotency protection
-- downstream failure simulation
-- application-level metrics
-- React operations dashboard
-- Docker Compose local environment
-- GitHub Actions CI
+## Demo flow
 
-## What the demo will show
+1. Generate 100 Events
+2. Inject HTTP 500 or latency
+3. Generate additional workload and watch lag/retries/DLQ
+4. Restore Healthy
+5. Replay DLQ
+6. Watch the backlog drain
 
-1. Generate traffic.
-2. Watch throughput, latency, failures, retries, DLQ depth, and lag.
-3. Inject latency or HTTP 500 failures.
-4. Observe degradation and backlog growth.
-5. Restore the dependency.
-6. Replay failed events.
-7. Verify the backlog drains without duplicate processing.
+See [docs/architecture.md](docs/architecture.md) and [docs/design-decisions.md](docs/design-decisions.md).
 
-## Status
+## Public demo note
 
-Initial implementation in progress.
+The portfolio deployment is intentionally a demo environment and may use ephemeral runtime state. The reference architecture keeps service boundaries explicit so components can be deployed independently in a production environment.

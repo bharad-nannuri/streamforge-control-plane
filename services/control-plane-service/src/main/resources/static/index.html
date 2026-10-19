@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StreamForge Control Plane</title>
+<style>
+:root{--bg:#07090d;--p:#0e131b;--p2:#111824;--ln:#222d3c;--tx:#f4f7fb;--mu:#8b98aa;--a:#f2b84b;--g:#58d68d;--r:#ff6b6b;--b:#68aaff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 85% -10%,rgba(242,184,75,.12),transparent 28%),var(--bg);color:var(--tx);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:1420px;margin:auto;padding:22px}.top{display:flex;justify-content:space-between;align-items:center;padding:8px 0 25px}.brand{display:flex;align-items:center;gap:11px}.logo{width:42px;height:42px;border:1px solid #735c28;border-radius:13px;display:grid;place-items:center;color:var(--a);font:900 23px Georgia;background:#101219}.brand small{display:block;color:var(--mu);margin-top:2px}.live{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#b6c0ce}.live:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--g);margin-right:8px}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:20px}.card{border:1px solid var(--ln);background:linear-gradient(180deg,var(--p2),var(--p));border-radius:20px;box-shadow:0 20px 70px rgba(0,0,0,.25)}.main{padding:34px}.ey{color:var(--a);font-size:11px;text-transform:uppercase;letter-spacing:.17em;font-weight:800}.main h1{font:700 clamp(44px,6vw,76px)/.98 Georgia;margin:12px 0 16px;letter-spacing:-.04em}.main h1 em{color:var(--a);font-style:normal}.main p{color:#b8c2d0;max-width:760px;line-height:1.65}.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.chip{border:1px solid #293446;border-radius:999px;padding:6px 9px;color:#aebaca;font-size:11px}.arch{padding:24px}.arch h3,.head h2{margin:0}.arch pre{margin:14px 0 0;padding:15px;border:1px solid #1d2633;background:#080b10;border-radius:13px;color:#bdc9d7;font:12px/1.55 ui-monospace,monospace;overflow:auto}
+.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:11px;margin:20px 0}.metric{padding:17px;border:1px solid var(--ln);background:var(--p);border-radius:15px}.metric label{font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--mu);font-weight:800}.metric strong{display:block;font:700 29px Georgia;margin-top:6px}.metric span{font-size:10px;color:#687588}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px}.panel{padding:20px;margin-bottom:20px}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}.head p{margin:3px 0 0;font-size:11px;color:var(--mu)}.badge{padding:5px 8px;border:1px solid #2b3748;border-radius:999px;font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+.controls{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.btn{border:1px solid #2b3748;background:#101722;color:#e8edf5;border-radius:11px;padding:11px 12px;text-align:left;font-weight:750;cursor:pointer}.btn small{display:block;margin-top:3px;color:#77869a;font-weight:500}.btn:hover{border-color:#52637a}.btn.primary{background:linear-gradient(#f6c35b,#d99d31);color:#17120a;border-color:var(--a)}.btn.bad{color:#ffaaaa;border-color:#704141}.btn.good{color:#9aefbd;border-color:#315f46}.btn.violet{color:#c6b8ff;border-color:#544a78}.btn:disabled{opacity:.45}
+.services{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.svc{padding:12px;border:1px solid #202a38;border-radius:12px;background:#090d13}.svc small{display:block;color:#7e8a9d;text-transform:uppercase;font-size:9px;letter-spacing:.08em}.state{margin-top:7px;font-weight:800;font-size:12px}.state i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}.ok i{background:var(--g)}.no i{background:var(--r)}
+.chart{height:190px;border:1px solid #1e2734;border-radius:13px;background:#080b10;padding:8px}.chart svg{width:100%;height:100%}.axis{stroke:#1d2632}.tline{fill:none;stroke:var(--a);stroke-width:3}.lline{fill:none;stroke:var(--b);stroke-width:2}.legend{font-size:10px;color:#77869a;margin-top:8px}.legend b{color:var(--a)}.legend span{color:var(--b);margin-left:15px}
+.table{overflow:auto;border:1px solid #1e2734;border-radius:13px}table{width:100%;border-collapse:collapse;min-width:720px;font-size:11px}th,td{padding:10px;border-bottom:1px solid #171e29;text-align:left}th{font-size:8px;color:#758195;text-transform:uppercase;letter-spacing:.08em;background:#090d13}.st{border-radius:999px;padding:4px 7px;font-size:8px;font-weight:900}.PROCESSED{color:#83e6aa;background:#143323}.DLQ,.PUBLISH_FAILED{color:#ff9a9a;background:#341b1b}.RETRYING,.PROCESSING,.REPLAYING{color:#f3c86e;background:#302815}.ACCEPTED{color:#8dbfff;background:#14283f}.timeline{height:190px;overflow:auto;border-left:1px solid #283344;padding-left:14px}.entry{font-size:11px;color:#9aa7b8;margin-bottom:11px}.entry b{color:#dbe4ef}.foot{display:flex;justify-content:space-between;color:#5f6d7f;font-size:10px;padding:6px 1px 25px}.foot a{color:#94a4b9;text-decoration:none}.toast{position:fixed;right:20px;bottom:20px;background:#111824;border:1px solid #2d394b;padding:11px 13px;border-radius:11px;font-size:11px;opacity:0;transition:.2s}.toast.show{opacity:1}.toast.err{color:#ffadad;border-color:#714343}
+@media(max-width:1050px){.hero,.grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(3,1fr)}}@media(max-width:650px){.wrap{padding:13px}.metrics{grid-template-columns:repeat(2,1fr)}.controls,.services{grid-template-columns:1fr}.main{padding:24px}.main h1{font-size:44px}}
+</style>
+</head>
+<body><div class="wrap">
+<div class="top"><div class="brand"><div class="logo">S</div><div><b>StreamForge</b><small>Distributed Systems Lab</small></div></div><div class="live" id="live">connecting</div></div>
+<div class="hero"><section class="card main"><div class="ey">Interactive resilience control plane</div><h1>Make failure <em>visible.</em></h1><p>Generate workload, inject dependency failures, watch Kafka consumer lag and retries build, restore the service, then replay dead-lettered events without duplicate processing.</p><div class="chips"><span class="chip">Java 21</span><span class="chip">Spring Boot</span><span class="chip">Apache Kafka</span><span class="chip">PostgreSQL</span><span class="chip">Micrometer</span><span class="chip">Prometheus</span><span class="chip">Docker</span></div></section>
+<aside class="card arch"><h3>Runtime topology</h3><pre>Ingress API
+    |
+    v
+  Kafka ------> Retry / DLQ
+    |              |
+    v              |
+ Processor <--------+
+    |
+    +--> PostgreSQL
+    +--> Downstream Simulator</pre></aside></div>
+<div class="metrics">
+<div class="metric"><label>Throughput</label><strong id="throughput">0</strong><span>events / sec</span></div>
+<div class="metric"><label>Consumer lag</label><strong id="lag">0</strong><span>offsets behind</span></div>
+<div class="metric"><label>P95 latency</label><strong id="p95">0</strong><span>milliseconds</span></div>
+<div class="metric"><label>Processed</label><strong id="processed">0</strong><span>successful</span></div>
+<div class="metric"><label>Retry + DLQ</label><strong id="failures">0</strong><span>degraded</span></div>
+<div class="metric"><label>Success rate</label><strong id="success">100%</strong><span>submitted events</span></div>
+</div>
+<div class="grid"><div>
+<section class="card panel"><div class="head"><div><h2>Workload & failure controls</h2><p>Drive the system into healthy and degraded states.</p></div><span class="badge" id="mode">HEALTHY</span></div><div class="controls">
+<button class="btn primary" onclick="traffic(100)">Generate 100 Events<small>Drive the ingestion API.</small></button>
+<button class="btn" onclick="traffic(500)">Generate 500 Events<small>Create visible backlog.</small></button>
+<button class="btn bad" onclick="failure('FAIL_500')">Inject HTTP 500<small>Force retry and DLQ pressure.</small></button>
+<button class="btn bad" onclick="failure('UNAVAILABLE')">Dependency Unavailable<small>Return HTTP 503.</small></button>
+<button class="btn" onclick="failure('LATENCY',1600)">Add 1.6s Latency<small>Simulate a gray failure.</small></button>
+<button class="btn" onclick="failure('CHAOS',500)">Chaos Mode<small>40% intermittent failures.</small></button>
+<button class="btn good" onclick="failure('HEALTHY')">Restore Healthy<small>Recover downstream processing.</small></button>
+<button class="btn violet" onclick="replay()">Replay DLQ<small>Republish failed events.</small></button>
+</div></section>
+<section class="card panel"><div class="head"><div><h2>Live telemetry</h2><p>Throughput and Kafka consumer lag.</p></div><span class="badge">2s refresh</span></div><div class="chart"><svg viewBox="0 0 800 170" preserveAspectRatio="none"><line class="axis" x1="0" y1="145" x2="800" y2="145"/><line class="axis" x1="0" y1="85" x2="800" y2="85"/><line class="axis" x1="0" y1="25" x2="800" y2="25"/><polyline id="tp" class="tline" points=""/><polyline id="lg" class="lline" points=""/></svg></div><div class="legend"><b>throughput</b><span>consumer lag</span></div></section>
+<section class="card panel"><div class="head"><div><h2>Recent events</h2><p>Latest state persisted in PostgreSQL.</p></div><span class="badge" id="count">0 events</span></div><div class="table"><table><thead><tr><th>Event</th><th>Status</th><th>Attempts</th><th>Replays</th><th>Latency</th><th>Error</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+</div><div>
+<section class="card panel"><div class="head"><div><h2>Runtime health</h2><p>Services, broker, database.</p></div><span class="badge">live</span></div><div class="services" id="services"></div></section>
+<section class="card panel"><div class="head"><div><h2>Recovery state</h2><p>Queue pressure and terminal outcomes.</p></div></div><div class="services"><div class="svc"><small>Backlog</small><div class="state" id="backlog">0</div></div><div class="svc"><small>Retrying</small><div class="state" id="retrying">0</div></div><div class="svc"><small>DLQ</small><div class="state" id="dlq">0</div></div></div></section>
+<section class="card panel"><div class="head"><div><h2>Incident timeline</h2><p>Actions in this browser session.</p></div><button class="btn" style="padding:6px 9px;font-size:9px" onclick="resetDemo()">Reset</button></div><div class="timeline" id="timeline"></div></section>
+<section class="card panel"><div class="head"><div><h2>Engineering contract</h2><p>What this demo proves.</p></div></div><div style="font-size:11px;line-height:1.8;color:#95a3b5"><b style="color:#e7edf5">At-least-once:</b> processors tolerate redelivery.<br><b style="color:#e7edf5">Failure is testable:</b> latency and hard failures are first-class controls.<br><b style="color:#e7edf5">Recovery is observable:</b> retries, DLQ, lag, replay and latency are visible.<br><b style="color:#e7edf5">State is disposable:</b> this is a portfolio lab, not a production datastore.</div></section>
+</div></div>
+<div class="foot"><span>StreamForge Control Plane · engineering portfolio lab</span><a href="https://github.com/bharad-nannuri/streamforge-control-plane" target="_blank">Source on GitHub ↗</a></div>
+</div><div id="toast" class="toast"></div>
+<script>
+var hist={t:[],l:[]}, events=[], busy=0;
+function n(v){return Number(v||0).toLocaleString()}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]})}
+function log(msg){events.unshift({t:new Date().toLocaleTimeString(),m:msg});events=events.slice(0,20);document.getElementById("timeline").innerHTML=events.map(function(e){return '<div class="entry"><b>'+e.t+'</b> · '+esc(e.m)+'</div>'}).join("")}
+function toast(msg,err){var e=document.getElementById("toast");e.textContent=msg;e.className="toast show"+(err?" err":"");clearTimeout(window.tt);window.tt=setTimeout(function(){e.className="toast"},2500)}
+function lock(on){busy+=on?1:-1;busy=Math.max(0,busy);document.querySelectorAll("button").forEach(function(b){b.disabled=busy>0})}
+async function api(url,opt){var r=await fetch(url,opt||{});if(!r.ok)throw new Error(r.status+" "+await r.text());return r.json()}
+async function traffic(c){lock(1);log("Generating "+c+" workload events");try{var r=await api("/api/control/traffic?count="+c,{method:"POST"});toast(r.generated+" events accepted");log(r.generated+" events accepted by ingestion")}catch(e){toast(e.message,1);log("Traffic failed: "+e.message)}finally{lock(0);setTimeout(refresh,500)}}
+async function failure(mode,lat){lock(1);log("Downstream -> "+mode);try{await api("/api/control/failure?mode="+encodeURIComponent(mode)+"&latencyMs="+(lat||1200),{method:"POST"});toast("Mode: "+mode)}catch(e){toast(e.message,1)}finally{lock(0);setTimeout(refresh,300)}}
+async function replay(){lock(1);log("Replaying DLQ");try{var r=await api("/api/control/replay?limit=1000",{method:"POST"});toast(r.replayed+" replayed");log(r.replayed+" DLQ events republished")}catch(e){toast(e.message,1)}finally{lock(0);setTimeout(refresh,500)}}
+async function resetDemo(){lock(1);try{var r=await api("/api/control/reset",{method:"POST"});hist={t:[],l:[]};events=[];log("Demo reset; "+r.deleted+" rows cleared");toast("Demo reset")}catch(e){toast(e.message,1)}finally{lock(0);setTimeout(refresh,400)}}
+function points(a){if(a.length<2)return "";var max=Math.max.apply(null,[1].concat(a)),w=800,h=150;return a.map(function(v,i){return (5+i/(a.length-1)*790)+","+(h-(v/max)*(h-20)+10)}).join(" ")}
+function push(k,v){hist[k].push(Number(v||0));if(hist[k].length>40)hist[k].shift()}
+function render(d){document.getElementById("live").textContent="runtime connected";document.getElementById("throughput").textContent=Number(d.throughputPerSecond||0).toFixed(1);document.getElementById("lag").textContent=n(d.consumerLag);document.getElementById("p95").textContent=n(d.p95LatencyMs);document.getElementById("processed").textContent=n(d.processed);document.getElementById("failures").textContent=n(Number(d.retrying||0)+Number(d.dlq||0));document.getElementById("success").textContent=Number(d.successRate||0).toFixed(2)+"%";document.getElementById("backlog").textContent=n(d.backlog);document.getElementById("retrying").textContent=n(d.retrying);document.getElementById("dlq").textContent=n(d.dlq);var mode=d.downstream&&d.downstream.mode||"UNKNOWN";document.getElementById("mode").textContent=mode;document.getElementById("services").innerHTML=Object.keys(d.services||{}).map(function(k){var s=d.services[k],cl=s==="HEALTHY"?"ok":"no";return '<div class="svc '+cl+'"><small>'+esc(k)+'</small><div class="state"><i></i>'+esc(s)+'</div></div>'}).join("");document.getElementById("count").textContent=n(d.total)+" events";document.getElementById("rows").innerHTML=(d.recent||[]).map(function(e){var er=e.last_error||"—";return '<tr><td>'+esc(String(e.event_id).slice(0,8))+'…</td><td><span class="st '+esc(e.status)+'">'+esc(e.status)+'</span></td><td>'+n(e.attempts)+'</td><td>'+n(e.replay_count)+'</td><td>'+(e.processing_duration_ms==null?"—":n(e.processing_duration_ms)+" ms")+'</td><td>'+esc(er.slice(0,45))+'</td></tr>'}).join("")||'<tr><td colspan="6">No events yet. Generate traffic.</td></tr>';push("t",d.throughputPerSecond);push("l",d.consumerLag);document.getElementById("tp").setAttribute("points",points(hist.t));document.getElementById("lg").setAttribute("points",points(hist.l))}
+async function refresh(){try{render(await api("/api/control/summary"))}catch(e){document.getElementById("live").textContent="runtime unavailable"}}
+log("Control plane loaded");refresh();setInterval(refresh,2000);
+</script></body></html>

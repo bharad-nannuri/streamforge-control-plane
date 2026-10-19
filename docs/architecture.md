@@ -1,46 +1,29 @@
-# StreamForge v1 Architecture
+# Architecture
 
 ## Goal
 
-Demonstrate how a distributed event-processing platform behaves under load and partial failure.
-
-## Core flow
+Demonstrate how a distributed event-processing system behaves under healthy load, partial failure, retry pressure, dead-letter handling, and recovery.
 
 ```text
-Client
-  |
-  v
-Ingestion Service
-  |
-  v
-Kafka topic: streamforge.events
-  |
-  v
-Processor Service
-  |
-  +----> PostgreSQL
-  |
-  +----> Downstream Simulator
-            |
-            +----> success
-            +----> latency
-            +----> HTTP 500
-
-Failures
-  |
-  +----> retry topic(s)
-  |
-  +----> DLQ
-          |
-          v
-        replay
+Browser -> Control Plane -> Ingestion API -> Kafka -> Processor -> Downstream Simulator
+                                              |           |
+                                              |           +-> PostgreSQL event state
+                                              |
+                                              +-> retry -> DLQ -> replay -> Kafka
 ```
 
-## Design principles
+### ingestion-service
+Accepts events over HTTP, applies idempotency keys, persists the event envelope, and publishes it to Kafka.
 
-- At-least-once event delivery.
-- Idempotent processing to tolerate redelivery.
-- Explicit retry and DLQ behavior.
-- Application-level metrics, not only CPU/memory.
-- Failure injection as a first-class demo capability.
-- Recovery should be observable and explainable.
+### processor-service
+Consumes Kafka records, tracks attempts, calls the downstream dependency, marks successful events, and routes exhausted failures to the DLQ.
+
+### downstream-simulator
+Provides HEALTHY, LATENCY, CHAOS, FAIL_500, and UNAVAILABLE modes.
+
+### control-plane-service
+Serves the dashboard, generates traffic, changes failure modes, exposes aggregate event metrics, reports dependency health, measures Kafka consumer lag, and replays DLQ events.
+
+## Delivery semantics
+
+The runtime intentionally uses **at-least-once delivery**. Event IDs and idempotency keys are persisted so duplicate work can be detected and skipped.
