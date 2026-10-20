@@ -7,9 +7,6 @@ export class StreamForgeContainer extends Container {
   enableInternet = false;
 
   async fetch(request) {
-    // StreamForge has a deliberately heavy cold start (Postgres + Kafka + four
-    // Spring services). Wait for the public control-plane port instead of
-    // forwarding the first request while the runtime is still booting.
     await this.startAndWaitForPorts({
       ports: [8080],
       cancellationOptions: {
