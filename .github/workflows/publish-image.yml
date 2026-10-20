@@ -1,0 +1,47 @@
+name: publish-container-image
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "Dockerfile.cloudflare"
+      - "cloudflare/**"
+      - "services/**"
+      - "pom.xml"
+      - ".github/workflows/publish-image.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push public demo image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.cloudflare
+          push: true
+          tags: |
+            ghcr.io/bharad-nannuri/streamforge-control-plane:latest
+            ghcr.io/bharad-nannuri/streamforge-control-plane:${{ github.sha }}
+
+      - name: Make package public
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method PATCH \
+            /user/packages/container/streamforge-control-plane \
+            -f visibility=public
