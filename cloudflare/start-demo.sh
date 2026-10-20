@@ -114,19 +114,24 @@ export PROCESSOR_URL=http://127.0.0.1:8082
 
 JAVA_LIMITS="-Xms32m -Xmx192m -XX:+UseSerialGC"
 
-log "starting application services"
+log "starting downstream simulator"
 java $JAVA_LIMITS -jar /app/downstream-simulator.jar >/app/logs/downstream.log 2>&1 &
 DOWNSTREAM_PID=$!
+wait_port 127.0.0.1 8083 downstream 120
+
+log "starting ingestion service"
 java $JAVA_LIMITS -jar /app/ingestion-service.jar >/app/logs/ingestion.log 2>&1 &
 INGESTION_PID=$!
+wait_port 127.0.0.1 8081 ingestion 120
+
+log "starting processor service"
 java $JAVA_LIMITS -jar /app/processor-service.jar >/app/logs/processor.log 2>&1 &
 PROCESSOR_PID=$!
+wait_port 127.0.0.1 8082 processor 120
+
+log "starting control plane"
 java $JAVA_LIMITS -jar /app/control-plane-service.jar >/app/logs/control-plane.log 2>&1 &
 CONTROL_PID=$!
-
-wait_port 127.0.0.1 8083 downstream 120
-wait_port 127.0.0.1 8081 ingestion 120
-wait_port 127.0.0.1 8082 processor 120
 wait_port 127.0.0.1 8080 control-plane 120
 
 cleanup() {
