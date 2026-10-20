@@ -7,6 +7,18 @@ log() {
   printf '[streamforge-runtime] %s\n' "$*"
 }
 
+dump_logs() {
+  log "startup failed; dumping recent component logs"
+  for f in /tmp/streamforge-postgres.log /app/logs/kafka.log /app/logs/downstream.log /app/logs/ingestion.log /app/logs/processor.log /app/logs/control-plane.log; do
+    if [[ -f "$f" ]]; then
+      printf '\n===== %s =====\n' "$f"
+      tail -n 120 "$f" || true
+    fi
+  done
+}
+
+trap dump_logs ERR
+
 wait_port() {
   local host="$1"
   local port="$2"
@@ -40,7 +52,11 @@ if [[ ! -f /tmp/streamforge-pg/PG_VERSION ]]; then
   su -s /bin/bash postgres -c "$PG_BIN/initdb -D /tmp/streamforge-pg --auth=trust --no-locale --encoding=UTF8" >/app/logs/postgres-init.log
 fi
 
-su -s /bin/bash postgres -c "$PG_BIN/pg_ctl -D /tmp/streamforge-pg -o \"-h 127.0.0.1 -p 5432\" -l /app/logs/postgres.log start"
+# pg_ctl runs as the postgres user, so its log target must be writable by postgres.
+rm -f /tmp/streamforge-postgres.log
+touch /tmp/streamforge-postgres.log
+chown postgres:postgres /tmp/streamforge-postgres.log
+su -s /bin/bash postgres -c "$PG_BIN/pg_ctl -D /tmp/streamforge-pg -o \"-h 127.0.0.1 -p 5432\" -l /tmp/streamforge-postgres.log start"
 wait_port 127.0.0.1 5432 postgres
 
 if ! "$PG_BIN/psql" -h 127.0.0.1 -U postgres -Atqc "select 1 from pg_database where datname='streamforge'" | grep -q 1; then
@@ -124,6 +140,7 @@ cleanup() {
   su -s /bin/bash postgres -c "$PG_BIN/pg_ctl -D /tmp/streamforge-pg stop -m fast" >/dev/null 2>&1 || true
 }
 trap cleanup EXIT INT TERM
+trap - ERR
 
 log "StreamForge ready: http://127.0.0.1:8080"
 wait "$CONTROL_PID"
