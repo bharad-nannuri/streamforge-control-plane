@@ -52,7 +52,8 @@ if [[ ! -f /tmp/streamforge-pg/PG_VERSION ]]; then
   su -s /bin/bash postgres -c "$PG_BIN/initdb -D /tmp/streamforge-pg --auth=trust --no-locale --encoding=UTF8" >/app/logs/postgres-init.log
 fi
 
-# pg_ctl runs as the postgres user, so its log target must be writable by postgres.
+# pg_ctl runs as the postgres user, so its runtime and log targets must be writable by postgres.
+install -d -o postgres -g postgres /var/run/postgresql
 rm -f /tmp/streamforge-postgres.log
 touch /tmp/streamforge-postgres.log
 chown postgres:postgres /tmp/streamforge-postgres.log
