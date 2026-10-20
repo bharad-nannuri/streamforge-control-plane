@@ -56,7 +56,7 @@ fi
 rm -f /tmp/streamforge-postgres.log
 touch /tmp/streamforge-postgres.log
 chown postgres:postgres /tmp/streamforge-postgres.log
-su -s /bin/bash postgres -c "$PG_BIN/pg_ctl -D /tmp/streamforge-pg -o \"-h 127.0.0.1 -p 5432\" -l /tmp/streamforge-postgres.log start"
+su -s /bin/bash postgres -c "$PG_BIN/pg_ctl -D /tmp/streamforge-pg -o \"-h 127.0.0.1 -p 5432 -k /tmp\" -l /tmp/streamforge-postgres.log start"
 wait_port 127.0.0.1 5432 postgres
 
 if ! "$PG_BIN/psql" -h 127.0.0.1 -U postgres -Atqc "select 1 from pg_database where datname='streamforge'" | grep -q 1; then
