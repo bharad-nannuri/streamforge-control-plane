@@ -2,7 +2,7 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "streamforge-labs",
   "main": "cloudflare/src/index.js",
-  "compatibility_date": "2026-10-19",
+  "compatibility_date": "2026-10-21",
   "upload_source_maps": true,
   "containers": [
     {
@@ -27,6 +27,12 @@
       "storage": "sqlite"
     }
   },
+  "services": [
+    {
+      "binding": "RECOVERYMESH_SERVICE",
+      "service": "recoverymesh-labs"
+    }
+  ],
   "routes": [
     {
       "pattern": "labs.bharadnannuri.com",
