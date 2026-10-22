@@ -1,0 +1,60 @@
+name: labs-public-smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/labs-public-smoke.yml"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Engineering Labs landing page
+        run: |
+          set -euo pipefail
+          for i in {1..20}; do
+            body="$(curl -sS --max-time 20 https://labs.bharadnannuri.com/ || true)"
+            if grep -q "Engineering Labs" <<<"$body"; then
+              echo "Landing page OK"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Landing page validation failed"
+          exit 1
+
+      - name: Verify StreamForge routed path
+        run: |
+          set -euo pipefail
+          for i in {1..30}; do
+            body="$(curl -sS --max-time 25 https://labs.bharadnannuri.com/streamforge/ || true)"
+            if grep -q "StreamForge" <<<"$body"; then
+              api="$(curl -sS --max-time 25 https://labs.bharadnannuri.com/streamforge/api/control/summary || true)"
+              if grep -q '"services"' <<<"$api"; then
+                echo "StreamForge routed UI + API OK"
+                exit 0
+              fi
+            fi
+            sleep 4
+          done
+          echo "StreamForge route validation failed"
+          exit 1
+
+      - name: Verify RecoveryMesh routed path
+        run: |
+          set -euo pipefail
+          for i in {1..30}; do
+            body="$(curl -sS --max-time 25 https://labs.bharadnannuri.com/recoverymesh/ || true)"
+            if grep -q "RecoveryMesh" <<<"$body"; then
+              api="$(curl -sS --max-time 25 https://labs.bharadnannuri.com/recoverymesh/api/status || true)"
+              if grep -q '"activeSite"' <<<"$api"; then
+                echo "RecoveryMesh routed UI + API OK"
+                exit 0
+              fi
+            fi
+            sleep 4
+          done
+          echo "RecoveryMesh route validation failed"
+          exit 1
